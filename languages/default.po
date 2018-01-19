@@ -1,0 +1,105 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Sprout Invoices + Gravity Forms\n"
+"POT-Creation-Date: 2018-01-19 10:33-0800\n"
+"PO-Revision-Date: 2018-01-19 10:33-0800\n"
+"Last-Translator: Dan Cameron <l10n@sproutapps.co>\n"
+"Language-Team: Sprout Apps <i18n@sproutapps.co>\n"
+"Language: En\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.7\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-Basepath: /Users/dancameron/Projects/Sprout_Apps/development/wp-"
+"content/\n"
+"X-Poedit-SearchPath-0: plugins/sprout-invoices-gravity-forms-integration\n"
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:191
+msgid "Integration Mapping"
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:199
+msgid "Invoice/Estimate Title"
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:204
+msgid "Company Name"
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:209
+msgid "User First Name"
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:214
+msgid "User Last Name"
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:219
+msgid "Email"
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:224
+msgid "Address"
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:229
+msgid "Notes"
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:234
+msgid "Estimate/Invoice Number"
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:239
+msgid "VAT Number"
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:244
+msgid "Line Items"
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:246
+msgid ""
+"Line items will be created from the products the user selects. How-to: add a "
+"products field (and add all products and prices), then select it here."
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:250
+msgid "SI Pre-defined Line Items"
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:252
+msgid ""
+"Instead of using products this will modify a \"checkboxes\" field to show "
+"Sprout Invoices line items. Hot-to: add a blank \"checkboxes\" field to your "
+"form and select it here."
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:258
+msgid "Line Item Type for Products"
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:261
+msgid "Ignore this if you are not using products to build line items."
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:266
+msgid "Redirect"
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:269
+msgid "Redirects the form submitter to the invoice or estimate created."
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:313
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:316
+#, php-format
+msgid "Invoice Submitted: Form %s."
+msgstr ""
+
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:355
+#: plugins/sprout-invoices-gravity-forms-integration/inc/SI_GF_Integration_Addon.php:358
+#, php-format
+msgid "Estimate Submitted: Form %s."
+msgstr ""
