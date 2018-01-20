@@ -9,7 +9,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 	protected $_slug = 'sprout-invoices-gravity-forms-integration';
 	protected $_path = 'sprout-invoices-gravity-forms-integration/sprout-invoices-gravity-forms-integration.php';
 	protected $_full_path = __FILE__;
-	protected $_title = 'Gravity Forms Simple Add-On';
+	protected $_title = 'Sprout Invoices + Gravity Forms';
 	protected $_short_title = 'Sprout Invoices';
 
 	private static $_instance = null;
@@ -543,4 +543,3 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		return $results;
 	}
 }
-
