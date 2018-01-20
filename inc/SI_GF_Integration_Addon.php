@@ -220,9 +220,9 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 								'required' => 1,
 							),
 							array(
-								'name'       => 'address',
-								'label'      => __( 'Address', 'sprout-invoices' ),
-								'required'   => 0,
+								'name'     => 'address',
+								'label'    => __( 'Address', 'sprout-invoices' ),
+								'required' => 0,
 								'field_type' => array( 'address' ),
 							),
 							array(
