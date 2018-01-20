@@ -27,9 +27,11 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 	public function init() {
 		parent::init();
 
-		add_filter( 'gform_pre_render', array( __CLASS__, 'populate_gf_choice_fields' ), 9 );
-		add_filter( 'gform_pre_submission_filter', array( __CLASS__, 'populate_gf_choice_fields' ), 9 );
-		add_filter( 'gform_pre_validation', array( __CLASS__, 'populate_gf_choice_fields' ), 9 );
+		if ( self::is_pd_items_supported() ) {
+			add_filter( 'gform_pre_render', array( __CLASS__, 'populate_gf_choice_fields' ), 9 );
+			add_filter( 'gform_pre_submission_filter', array( __CLASS__, 'populate_gf_choice_fields' ), 9 );
+			add_filter( 'gform_pre_validation', array( __CLASS__, 'populate_gf_choice_fields' ), 9 );
+		}
 
 	}
 
@@ -72,7 +74,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		}
 
 		$line_items = array();
-		if ( isset( $field_map['products'] ) ) {
+		if ( ! empty( $field_map['products'] ) ) {
 			$entry_id = $field_map['products'];
 			if ( isset( $entry[ $entry_id ] ) ) {
 				$line_item = explode( '|', $entry[ $entry_id ] );
@@ -89,7 +91,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 			}
 		}
 
-		if ( isset( $field_map['pd_line_items'] ) ) {
+		if ( self::is_pd_items_supported() && ! empty( $field_map['pd_line_items'] ) ) {
 			$number_of_choices = count( self::line_item_choices( $field_map['pd_line_items'] ) );
 			for ( $i = 1; $i < $number_of_choices + 1; $i++ ) {
 				$item_id = ( isset( $entry[ $field_map['pd_line_items'] . '.' . $i ] ) ) ? $entry[ $field_map['pd_line_items'] . '.' . $i ] : '' ;
@@ -251,6 +253,8 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 								'label'    => __( 'SI Pre-defined Line Items', 'sprout-invoices' ),
 								'required' => 0,
 								'tooltip'  => __( 'Instead of using products this will modify a "checkboxes" field to show Sprout Invoices line items. Hot-to: add a blank "checkboxes" field to your form and select it here.', 'sprout-invoices' ),
+								'dependency' => array( __CLASS__, 'is_pd_items_supported' ),
+								'field_type' => array( 'checkbox' ),
 							),
 						),
 					),
@@ -541,5 +545,9 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		}
 
 		return $results;
+	}
+
+	public static function is_pd_items_supported() {
+		return class_exists( 'Predefined_Items' );
 	}
 }
