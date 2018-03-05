@@ -50,7 +50,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		do_action( 'si_log', __CLASS__ . '::' . __FUNCTION__ . ' - entry', $entry, false );
 		$generate  = $feed['meta']['si_generation'];
 		$product_type  = $feed['meta']['product_type'];
-		$redirect  = (bool) $feed['meta']['redirect'];
+		$redirect = ( isset( $feed['meta']['redirect'] ) && $feed['meta']['redirect'] ) ? true : false ;
 		$field_map = $this->get_field_map_fields( $feed, 'si_fields' );
 
 		// Loop through the fields from the field map setting building an array of values to be passed to the third-party service.
@@ -128,6 +128,10 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 			default:
 				// nada
 				break;
+		}
+
+		if ( $redirect ) {
+			error_log( 'true redirect: ' . print_r( $redirect, true ) );
 		}
 
 		if ( $redirect && ( isset( $invoice_id ) || isset( $estimate_id ) ) ) {
@@ -370,6 +374,9 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 	protected function create_client( $submission = array(), $entry = array(), $form = array(), $doc_id = 0 ) {
 
 		$email = $submission['email'];
+		$client_name = $submission['client_name'];
+		$first_name = $submission['user_first_name'];
+		$last_name = $submission['user_last_name'];
 
 		/**
 		 * Attempt to create a user before creating a client.
@@ -393,8 +400,8 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 					'user_login' => esc_attr__( $email ),
 					'display_name' => isset( $client_name ) ? esc_attr__( $client_name ) : esc_attr__( $email ),
 					'user_email' => esc_attr__( $email ),
-					'first_name' => si_split_full_name( esc_attr__( $full_name ), 'first' ),
-					'last_name' => si_split_full_name( esc_attr__( $full_name ), 'last' ),
+					'first_name' => $first_name,
+					'last_name' => $last_name,
 					'user_url' => '',
 				);
 				$user_id = SI_Clients::create_user( $user_args );
