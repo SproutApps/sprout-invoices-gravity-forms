@@ -214,11 +214,11 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 					),
 					array(
 						'name'     => 'line_items',
-						'type' => 'select',
-						'choices' => $this->get_line_items_field_choices(),
+						'type'     => 'select',
+						'choices'  => $this->get_line_items_field_choices(),
 						'label'    => __( 'Line Items', 'sprout-invoices' ),
 						'required' => 0,
-						'tooltip'  => __( 'Line items can be created from the product and options the user selects or a checkbox field populated with the Sprout Invoices line items.', 'sprout-invoices' ),
+						'tooltip'  => __( 'Line items can be created from the product and options the user selects or a checkbox field populated with the Sprout Invoices Pre-defined line items.', 'sprout-invoices' ),
 					),
 					array(
 						'name'       => 'product_type',
