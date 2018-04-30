@@ -284,6 +284,8 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 			0,
 		false );
 
+		do_action( 'si_gravity_forms_integration_invoice_created', $invoice, $submission, $entry, $form );
+
 		return $invoice_id;
 
 	}
@@ -325,6 +327,8 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 			sprintf( __( 'Estimate Submitted: Form %s.', 'sprout-invoices' ), $history_link ),
 			0,
 		false );
+
+		do_action( 'si_gravity_forms_integration_estimate_created', $estimate, $submission, $entry, $form );
 
 		return $estimate_id;
 	}
@@ -380,6 +384,8 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 			$client->save_post_meta( array( '_iva' => $submission['vat'] ) );
 			$client->save_post_meta( array( '_vat' => $submission['vat'] ) );
 		}
+
+		do_action( 'si_gravity_forms_integration_client_created', $client, $submission, $entry, $form, $doc_id );
 
 		if ( ! $doc_id ) {
 			return;
@@ -541,7 +547,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 			if ( $field->type === 'product' ) {
 				$product_fields[] = array(
 					'value' => 'product_' . $field->id,
-					'label' => GFCommon::get_label( $field )
+					'label' => GFCommon::get_label( $field ),
 				);
 				continue;
 			}
@@ -549,7 +555,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 			if ( $pd_line_items_supported && $field->get_input_type() === 'checkbox' ) {
 				$checkbox_fields[] = array(
 					'value' => 'checkbox_' . $field->id,
-					'label' => GFCommon::get_label( $field )
+					'label' => GFCommon::get_label( $field ),
 				);
 			}
 		}
@@ -635,7 +641,6 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 			}
 		}
 
-
 		return $line_items;
 	}
 
@@ -713,5 +718,4 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 			}
 		}
 	}
-
 }
