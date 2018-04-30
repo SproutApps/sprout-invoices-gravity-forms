@@ -73,43 +73,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 				);
 		}
 
-		$line_items = array();
-		if ( ! empty( $field_map['products'] ) ) {
-			$entry_id = $field_map['products'];
-			if ( isset( $entry[ $entry_id ] ) ) {
-				$line_item = explode( '|', $entry[ $entry_id ] );
-				if ( is_array( $line_item ) && strlen( (string) $line_item[0] ) > 0 ) {
-					$line_items[] = array(
-						'type' => $product_type,
-						'desc' => $line_item[0],
-						'rate' => $line_item[1],
-						'total' => $line_item[1],
-						'qty' => 1,
-						'tax' => apply_filters( 'si_form_submission_line_item_default_tax', 0.00 ),
-					);
-				}
-			}
-		}
-
-		if ( self::is_pd_items_supported() && ! empty( $field_map['pd_line_items'] ) ) {
-			$number_of_choices = count( self::line_item_choices( $field_map['pd_line_items'] ) );
-			for ( $i = 1; $i < $number_of_choices + 1; $i++ ) {
-				$item_id = ( isset( $entry[ $field_map['pd_line_items'] . '.' . $i ] ) ) ? $entry[ $field_map['pd_line_items'] . '.' . $i ] : '' ;
-				$item = SI_Item::get_instance( $item_id );
-				if ( ! is_a( $item, 'SI_Item' ) ) {
-					continue;
-				}
-				$line_items[] = array(
-					'rate' => $item->get_default_rate(),
-					'qty' => $item->get_default_qty(),
-					'tax' => $item->get_default_percentage(),
-					'total' => ($item->get_default_rate() * $item->get_default_qty()),
-					'desc' => $item->get_content(),
-				);
-			}
-		}
-
-		$submission['line_items'] = $line_items;
+		$submission['line_items'] = $this->get_line_items( $feed, $entry, $form );
 
 		do_action( 'si_log', __CLASS__ . '::' . __FUNCTION__ . ' - submission', $submission, false );
 
@@ -246,21 +210,15 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 								'label'      => __( 'VAT Number', 'sprout-invoices' ),
 								'required'   => 0,
 							),
-							array(
-								'name'     => 'products',
-								'label'    => __( 'Line Items', 'sprout-invoices' ),
-								'required' => 0,
-								'tooltip'  => __( 'Line items will be created from the products the user selects. How-to: add a products field (and add all products and prices), then select it here.', 'sprout-invoices' ),
-							),
-							array(
-								'name'     => 'pd_line_items',
-								'label'    => __( 'SI Pre-defined Line Items', 'sprout-invoices' ),
-								'required' => 0,
-								'tooltip'  => __( 'Instead of using products this will modify a "checkboxes" field to show Sprout Invoices line items. Hot-to: add a blank "checkboxes" field to your form and select it here.', 'sprout-invoices' ),
-								'dependency' => array( __CLASS__, 'is_pd_items_supported' ),
-								'field_type' => array( 'checkbox' ),
-							),
 						),
+					),
+					array(
+						'name'     => 'line_items',
+						'type'     => 'select',
+						'choices'  => $this->get_line_items_field_choices(),
+						'label'    => __( 'Line Items', 'sprout-invoices' ),
+						'required' => 0,
+						'tooltip'  => __( 'Line items can be created from the product and options the user selects or a checkbox field populated with the Sprout Invoices Pre-defined line items.', 'sprout-invoices' ),
 					),
 					array(
 						'name'       => 'product_type',
@@ -500,10 +458,16 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 					continue;
 				}
 
-				if ( ! isset( $feed['meta']['si_fields_pd_line_items'] ) || ! $feed['meta']['si_fields_pd_line_items'] ) {
+				$line_items_setting = rgar( $feed['meta'], 'line_items' );
+
+				if ( empty( $line_items_setting ) ) {
 					continue;
 				}
-				$id = $feed['meta']['si_fields_pd_line_items'];
+
+				list( $type, $field_id ) = explode( '_', $line_items_setting );
+				if ( $type === 'checkbox' ) {
+					return $field_id;
+				}
 			}
 		}
 
@@ -557,4 +521,197 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 	public static function is_pd_items_supported() {
 		return class_exists( 'Predefined_Items' );
 	}
+
+	/**
+	 * Get an array of choices to be available for selection in the Line Items setting.
+	 *
+	 * @return array
+	 */
+	public function get_line_items_field_choices() {
+		$form = $this->get_current_form();
+
+		$choices         = array();
+		$product_fields  = array();
+		$checkbox_fields = array();
+
+		$pd_line_items_supported = self::is_pd_items_supported();
+
+		/** @var GF_Field $field The field object. */
+		foreach ( $form['fields'] as $field ) {
+			if ( $field->type === 'product' ) {
+				$product_fields[] = array(
+					'value' => 'product_' . $field->id,
+					'label' => GFCommon::get_label( $field )
+				);
+				continue;
+			}
+
+			if ( $pd_line_items_supported && $field->get_input_type() === 'checkbox' ) {
+				$checkbox_fields[] = array(
+					'value' => 'checkbox_' . $field->id,
+					'label' => GFCommon::get_label( $field )
+				);
+			}
+		}
+
+		if ( ! empty( $product_fields ) ) {
+			$product_fields[] = array(
+				'value' => 'all_products',
+				'label' => __( 'All Pricing Fields', 'sprout-invoices' ),
+			);
+		}
+
+		// Add the optgroup for the product fields.
+		$choices[] = array(
+			'label'   => __( 'Product Fields', 'sprout-invoices' ),
+			'choices' => $product_fields,
+		);
+
+		if ( $pd_line_items_supported ) {
+			// Add the optgroup for the checkbox fields.
+			$choices[] = array(
+				'label'   => __( 'SI Pre-defined Line Items (Checkbox Fields)', 'sprout-invoices' ),
+				'choices' => $checkbox_fields,
+			);
+		}
+
+		return $choices;
+	}
+
+	/**
+	 * Get the line items for the current entry based on the current feed and form configuration.
+	 *
+	 * @param array $feed The current feed.
+	 * @param array $entry The current entry.
+	 * @param array $form  The current form.
+	 *
+	 * @return array
+	 */
+	public function get_line_items( $feed, $entry, $form ) {
+		$product_type       = rgar( $feed['meta'], 'product_type' );
+		$line_items_setting = rgar( $feed['meta'], 'line_items' );
+		$line_items         = array();
+
+		if ( $line_items_setting === 'all_products' ) {
+			$products = GFCommon::get_product_fields( $form, $entry );
+
+			if ( empty( $products['products'] ) ) {
+				return $line_items;
+			}
+
+			foreach ( $products['products'] as $product ) {
+				$line_items[] = $this->get_line_item_from_product( $product, $entry, $product_type );
+			}
+
+			if ( ! empty( $products['shipping']['name'] ) ) {
+				$line_items[] = $this->get_line_item_from_product( $products['shipping'], $entry, $product_type );
+			}
+		} elseif ( ! empty( $line_items_setting ) ) {
+			list( $type, $field_id ) = explode( '_', $line_items_setting );
+
+			if ( $type === 'product' ) {
+				$products = GFCommon::get_product_fields( $form, $entry );
+				$product  = rgar( $products['products'], $field_id );
+
+				if ( $product ) {
+					$line_items[] = $this->get_line_item_from_product( $product, $entry, $product_type );
+				}
+			} elseif ( $type === 'checkbox' && self::is_pd_items_supported() ) {
+				$number_of_choices = count( self::line_item_choices( $field_id ) );
+				for ( $i = 1; $i < $number_of_choices + 1; $i ++ ) {
+					$item_id = rgar( $entry, $field_id . '.' . $i );
+					$item    = SI_Item::get_instance( $item_id );
+					if ( ! is_a( $item, 'SI_Item' ) ) {
+						continue;
+					}
+					$line_items[] = array(
+						'rate'  => $item->get_default_rate(),
+						'qty'   => $item->get_default_qty(),
+						'tax'   => $item->get_default_percentage(),
+						'total' => ( $item->get_default_rate() * $item->get_default_qty() ),
+						'desc'  => $item->get_content(),
+					);
+				}
+			}
+		}
+
+
+		return $line_items;
+	}
+
+	/**
+	 * Get the line item array for a single product.
+	 *
+	 * @param array  $product      The product properties.
+	 * @param array  $entry        The current entry.
+	 * @param string $product_type The Sprout Invoices product type.
+	 *
+	 * @return array
+	 */
+	public function get_line_item_from_product( $product, $entry, $product_type ) {
+		$options = array();
+		if ( is_array( rgar( $product, 'options' ) ) ) {
+			foreach ( $product['options'] as $option ) {
+				$options[] = $option['option_name'];
+			}
+		}
+
+		if ( ! empty( $options ) ) {
+			$description = sprintf( esc_html__( '%s; options: %s', 'sprout-invoices' ), rgar( $product, 'name' ), implode( ', ', $options ) );
+		} else {
+			$description = rgar( $product, 'name', '' );
+		}
+
+		$rate     = GFCommon::to_number( rgar( $product, 'price', 0 ), $entry['currency'] );
+		$quantity = GFCommon::to_number( rgar( $product, 'quantity', 1 ), $entry['currency'] );
+
+		return array(
+			'type'  => $product_type,
+			'desc'  => wp_kses_post( $description ),
+			'rate'  => $rate,
+			'qty'   => $quantity,
+			'total' => $rate * $quantity,
+			'tax'   => apply_filters( 'si_form_submission_line_item_default_tax', 0.00 ),
+		);
+	}
+
+	/**
+	 * Performs installation or upgrade tasks.
+	 *
+	 * @param string $previous_version The previously installed version number.
+	 */
+	public function upgrade( $previous_version ) {
+		if ( ! empty( $previous_version ) && version_compare( $previous_version, '1.0.2', '<' ) ) {
+			$this->upgrade_102();
+		}
+	}
+
+	/**
+	 * Upgrade existing feeds using the si_fields_products and si_fields_pd_line_items settings to the new line_items setting.
+	 */
+	public function upgrade_102() {
+		$feeds = $this->get_feeds();
+
+		foreach ( $feeds as $feed ) {
+			$feed_dirty = false;
+			$feed_meta  = $feed['meta'];
+
+			$si_fields_products = rgar( $feed_meta, 'si_fields_products' );
+			if ( $si_fields_products ) {
+				$feed_meta['line_items'] = 'product_' . absint( $si_fields_products );
+				$feed_dirty              = true;
+			}
+
+			$si_fields_pd_line_items = rgar( $feed_meta, 'si_fields_pd_line_items' );
+			if ( $si_fields_pd_line_items ) {
+				$feed_meta['line_items'] = 'checkbox_' . absint( $si_fields_pd_line_items );
+				$feed_dirty              = true;
+			}
+
+			if ( $feed_dirty ) {
+				$this->update_feed_meta( $feed['id'], $feed_meta );
+			}
+		}
+	}
+
 }
