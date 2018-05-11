@@ -94,14 +94,15 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 				break;
 		}
 
-		if ( $redirect ) {
-			error_log( 'true redirect: ' . print_r( $redirect, true ) );
-		}
-
 		if ( $redirect && ( isset( $invoice_id ) || isset( $estimate_id ) ) ) {
+
 			if ( get_post_type( $invoice_id ) == SI_Invoice::POST_TYPE ) {
+				$invoice = SI_Invoice::get_instance( $invoice_id );
+				$invoice->set_pending();
 				$url = get_permalink( $invoice_id );
 			} elseif ( get_post_type( $estimate_id ) == SI_Estimate::POST_TYPE ) {
+				$estimate = SI_Estimate::get_instance( $estimate_id );
+				$estimate->set_pending();
 				$url = get_permalink( $estimate_id );
 			}
 
@@ -261,6 +262,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		$invoice = SI_Invoice::get_instance( $invoice_id );
 
 		$invoice->set_line_items( $submission['line_items'] );
+		$invoice->reset_totals();
 
 		// notes
 		if ( isset( $submission['notes'] ) ) {
@@ -305,6 +307,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		$estimate = SI_Estimate::get_instance( $estimate_id );
 
 		$estimate->set_line_items( $submission['line_items'] );
+		$estimate->reset_totals();
 
 		// notes
 		if ( isset( $submission['notes'] ) ) {
@@ -630,11 +633,13 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 					if ( ! is_a( $item, 'SI_Item' ) ) {
 						continue;
 					}
+					$subtotal = $item->get_default_rate() * $item->get_default_qty();
+					$tax_total = $subtotal * ( $item->get_default_percentage() / 100 );
 					$line_items[] = array(
 						'rate'  => $item->get_default_rate(),
 						'qty'   => $item->get_default_qty(),
 						'tax'   => $item->get_default_percentage(),
-						'total' => ( $item->get_default_rate() * $item->get_default_qty() ),
+						'total' => ( $subtotal - $tax_total ),
 						'desc'  => $item->get_content(),
 					);
 				}
