@@ -4,7 +4,7 @@ Donate link: https://sproutapps.co/
 Tags: invoice, invoicing, billing, estimates, gravity forms, billings, paypal, online payment
 Requires at least: 4.8
 Tested up to: 4.9
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,6 +40,10 @@ https://www.youtube.com/watch?v=-Q3uxmLwlQs
 3. Form submission with redirect to newly created invoice
 
 == Changelog ==
+
+= 1.0.4 =
+
+* Advanced ID Generation updates
 
 = 1.0.2 =
 

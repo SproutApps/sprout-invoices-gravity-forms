@@ -260,6 +260,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		 */
 		$invoice_id = SI_Invoice::create_invoice( $invoice_args );
 		$invoice = SI_Invoice::get_instance( $invoice_id );
+		do_action( 'si_invoice_submitted_from_adv_form', $invoice, $invoice_args );
 
 		$invoice->set_line_items( $submission['line_items'] );
 		$invoice->reset_totals();
@@ -305,6 +306,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		 */
 		$estimate_id = SI_Estimate::create_estimate( $estimate_args );
 		$estimate = SI_Estimate::get_instance( $estimate_id );
+		do_action( 'si_estimate_submitted_from_adv_form', $estimate, $estimate_args );
 
 		$estimate->set_line_items( $submission['line_items'] );
 		$estimate->reset_totals();
