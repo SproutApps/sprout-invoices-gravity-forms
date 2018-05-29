@@ -268,11 +268,11 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		$invoice->set_calculated_total();
 
 		// notes
-		if ( isset( $submission['notes'] ) ) {
+		if ( ! empty( $submission['notes'] ) ) {
 			$record_id = SI_Internal_Records::new_record( $submission['notes'], SI_Controller::PRIVATE_NOTES_TYPE, $invoice_id, '', 0, false );
 		}
 
-		if ( isset( $submission['number'] ) ) {
+		if ( ! empty( $submission['number'] ) ) {
 			$invoice->set_invoice_id( $submission['number'] );
 		}
 
@@ -316,11 +316,11 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		$estimate->set_calculated_total();
 
 		// notes
-		if ( isset( $submission['notes'] ) ) {
+		if ( ! empty( $submission['notes'] ) ) {
 			$record_id = SI_Internal_Records::new_record( $submission['notes'], SI_Controller::PRIVATE_NOTES_TYPE, $estimate_id, '', 0, false );
 		}
 
-		if ( isset( $submission['number'] ) ) {
+		if ( ! empty( $submission['number'] ) ) {
 			$estimate->set_estimate_id( $submission['number'] );
 		}
 
