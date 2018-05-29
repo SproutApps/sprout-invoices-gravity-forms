@@ -265,6 +265,8 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		$invoice->set_line_items( $submission['line_items'] );
 		$invoice->reset_totals();
 
+		$invoice->set_calculated_total();
+
 		// notes
 		if ( isset( $submission['notes'] ) ) {
 			$record_id = SI_Internal_Records::new_record( $submission['notes'], SI_Controller::PRIVATE_NOTES_TYPE, $invoice_id, '', 0, false );
@@ -310,6 +312,8 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 
 		$estimate->set_line_items( $submission['line_items'] );
 		$estimate->reset_totals();
+
+		$estimate->set_calculated_total();
 
 		// notes
 		if ( isset( $submission['notes'] ) ) {
