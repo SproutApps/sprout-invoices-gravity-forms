@@ -5,7 +5,7 @@
  * Plugin URI: https://sproutapps.co/sprout-invoices/integrations/
  * Description: Allows for a form submitted by Gravity Forms to create all necessary records to send your client an invoice or estimate.
  * Author: Sprout Apps
- * Version: 1.0.4
+ * Version: 1.1
  * Author URI: https://sproutapps.co
  * Text Domain: sprout-invoices
  * Domain Path: languages
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SI_GF_INTEGRATION_ADDON_VERSION', '1.0.4' );
+define( 'SI_GF_INTEGRATION_ADDON_VERSION', '1.1' );
 
 add_action( 'gform_loaded', array( 'SI_GF_Integration_Addon_Bootstrap', 'load' ), 5 );
 

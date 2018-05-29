@@ -4,7 +4,7 @@ Donate link: https://sproutapps.co/
 Tags: invoice, invoicing, billing, estimates, gravity forms, billings, paypal, online payment
 Requires at least: 4.8
 Tested up to: 4.9
-Stable tag: 1.0.4
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,6 +40,12 @@ https://www.youtube.com/watch?v=-Q3uxmLwlQs
 3. Form submission with redirect to newly created invoice
 
 == Changelog ==
+
+= 1.1 =
+
+* Fix empty note being added to the new invoice props richardW8k
+* Set the invoice/estimate totals props richardW8k
+* Add support for line items from all products props richardW8k
 
 = 1.0.4 =
 
