@@ -35,6 +35,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 
 	}
 
+
 	/**
 	 * Process the feed e.g. subscribe the user to a list.
 	 *
@@ -64,12 +65,16 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 
 		if ( isset( $field_map['address'] ) ) {
 			$addy_field_id = (int) $field_map['address'];
+			$state = str_replace( '  ', ' ', trim( rgar( $entry, $addy_field_id . '.4' ) ) );
+			$state_code = GF_Fields::get( 'address' )->get_us_state_code( $state );
+			$country = str_replace( '  ', ' ', trim( rgar( $entry, $addy_field_id . '.6' ) ) );
+			$country_code = GF_Fields::get( 'address' )->get_country_code( $country );
 			$submission['full_address'] = array(
 					'street' => str_replace( '  ', ' ', trim( rgar( $entry, $addy_field_id . '.1' ) ) ) . ' ' . str_replace( '  ', ' ', trim( rgar( $entry, $addy_field_id . '.2' ) ) ),
 					'city' => str_replace( '  ', ' ', trim( rgar( $entry, $addy_field_id . '.3' ) ) ),
-					'zone' => str_replace( '  ', ' ', trim( rgar( $entry, $addy_field_id . '.4' ) ) ),
+					'zone' => $state_code,
 					'postal_code' => str_replace( '  ', ' ', trim( rgar( $entry, $addy_field_id . '.5' ) ) ),
-					'country' => str_replace( '  ', ' ', trim( rgar( $entry, $addy_field_id . '.6' ) ) ),
+					'country' => $country_code,
 				);
 		}
 
@@ -108,13 +113,26 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 
 			if ( isset( $url ) ) {
 				if ( headers_sent() ) {
-					$confirmation = GFFormDisplay::get_js_redirect_confirmation( $url, $ajax );
+					$confirmation = self::gf_js_redirect( $url, $ajax );
+					return $confirmation;
 				} else {
 					wp_redirect( $url );
 					exit();
 				}
 			}
 		}
+	}
+
+	private static function gf_js_redirect( $url, $ajax ) {
+		$url = esc_url_raw( $url );
+		$confirmation = '<script type="text/javascript">' . apply_filters( 'gform_cdata_open', '' ) . " function gformRedirect(){document.location.href='$url';}";
+		if ( ! $ajax ) {
+			$confirmation .= 'gformRedirect();';
+		}
+
+		$confirmation .= apply_filters( 'gform_cdata_close', '' ) . '</script>';
+
+		return $confirmation;
 	}
 
 	public function feed_settings_fields() {
@@ -379,15 +397,32 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 			}
 		}
 
-		// Make up the args in creating a client
-		$args = array(
-			'company_name' => $submission['client_name'],
-			'website' => '',
-			'address' => $submission['full_address'],
-			'user_id' => $user_id,
-		);
-		$client_id = SI_Client::new_client( $args );
-		$client = SI_Client::get_instance( $client_id );
+		// check if client exists based on user submission
+		$client = false;
+		if ( $user_id ) {
+			$client_ids = SI_Client::get_clients_by_user( $user_id );
+			$clnt = ( ! empty( $client_ids ) ) ? SI_Client::get_instance( $client_ids[0] ) : 0 ;
+			if ( is_a( $clnt, 'SI_Client' ) ) {
+				$client = $clnt;
+			}
+		}
+
+		// if already exists based on the user submission
+		if ( $client ) {
+			$cleint->set_title( $submission['client_name'] );
+			$client->set_address( $submission['full_address'] );
+
+		} else {
+			// Make up the args in creating a client
+			$args = array(
+				'company_name' => $submission['client_name'],
+				'website' => '',
+				'address' => $submission['full_address'],
+				'user_id' => $user_id,
+			);
+			$client_id = SI_Client::new_client( $args );
+			$client = SI_Client::get_instance( $client_id );
+		}
 
 		if ( isset( $submission['vat'] ) ) {
 			$client->save_post_meta( array( '_iva' => $submission['vat'] ) );
@@ -683,7 +718,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 
 		return array(
 			'type'  => $product_type,
-			'desc'  => wp_kses_post( $description ),
+			'desc'  => wp_kses_post( apply_filters( 'si_gf_line_item_description', $description, $product, $options ) ),
 			'rate'  => $rate,
 			'qty'   => $quantity,
 			'total' => $rate * $quantity,
