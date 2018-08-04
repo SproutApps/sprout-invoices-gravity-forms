@@ -409,7 +409,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 
 		// if already exists based on the user submission
 		if ( $client ) {
-			$cleint->set_title( $submission['client_name'] );
+			$client->set_title( $submission['client_name'] );
 			$client->set_address( $submission['full_address'] );
 
 		} else {
