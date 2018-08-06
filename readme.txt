@@ -41,6 +41,13 @@ https://www.youtube.com/watch?v=-Q3uxmLwlQs
 
 == Changelog ==
 
+= 1.2 =
+
+* Add additional filters
+* Don't re-create a client if user is logged in or email matches
+* State and Country mapping
+
+
 = 1.1 =
 
 * Fix empty note being added to the new invoice props richardW8k
