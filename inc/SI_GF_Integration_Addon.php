@@ -409,7 +409,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 
 		// if already exists based on the user submission
 		if ( $client ) {
-			$cleint->set_title( $submission['client_name'] );
+			$client->set_title( $submission['client_name'] );
 			$client->set_address( $submission['full_address'] );
 
 		} else {
@@ -439,7 +439,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		 * After a client is created assign it to the estimate
 		 */
 		$doc = si_get_doc_object( $doc_id );
-		$doc->set_client_id( $client_id );
+		$doc->set_client_id( $client->get_id() );
 
 	}
 
