@@ -267,12 +267,15 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 
 	protected function create_invoice( $submission = array(), $entry = array(), $form = array() ) {
 
+		do_action( 'si_doc_generation_start' );
+
 		$invoice_args = array(
 			'subject' => sprintf( apply_filters( 'si_form_submission_title_format', '%1$s (%2$s)', $submission ), $submission['subject'], $submission['client_name'] ),
 			'fields' => $submission,
 			'form' => $form,
 			'history_link' => sprintf( '<a href="%s">#%s</a>', add_query_arg( array( 'id' => $entry['form_id'], 'lid' => $entry['id'] ), admin_url( 'admin.php?page=gf_entries&view=entry' ) ), $entry['id'] ),
 		);
+
 		/**
 		 * Creates the invoice from the arguments
 		 */
@@ -309,11 +312,15 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 
 		do_action( 'si_gravity_forms_integration_invoice_created', $invoice, $submission, $entry, $form );
 
+		do_action( 'si_doc_generation_complete', $invoice );
+
 		return $invoice_id;
 
 	}
 
 	protected function create_estimate( $submission = array(), $entry = array(), $form = array() ) {
+
+		do_action( 'si_doc_generation_start' );
 
 		$estimate_args = array(
 			'subject' => sprintf( apply_filters( 'si_form_submission_title_format', '%1$s (%2$s)', $submission ), $submission['subject'], $submission['client_name'] ),
@@ -356,6 +363,8 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		false );
 
 		do_action( 'si_gravity_forms_integration_estimate_created', $estimate, $submission, $entry, $form );
+
+		do_action( 'si_doc_generation_complete', $estimate );
 
 		return $estimate_id;
 	}
