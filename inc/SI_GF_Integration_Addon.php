@@ -620,6 +620,12 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 			);
 		}
 
+		// Add no value
+		$choices[] = array(
+			'label'   => __( 'None', 'sprout-invoices' ),
+			'value' => '',
+		);
+
 		// Add the optgroup for the product fields.
 		$choices[] = array(
 			'label'   => __( 'Product Fields', 'sprout-invoices' ),

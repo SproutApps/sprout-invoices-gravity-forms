@@ -3,8 +3,8 @@ Contributors: dancameron, sproutapps
 Donate link: https://sproutinvoices.com/
 Tags: invoice, invoicing, billing, estimates, gravity forms, billings, paypal, online payment
 Requires at least: 4.8
-Tested up to: 5.0
-Stable tag: 1.3.1
+Tested up to: 5.1
+Stable tag: 1.3.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
