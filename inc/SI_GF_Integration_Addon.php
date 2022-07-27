@@ -53,7 +53,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		$product_type  = $feed['meta']['product_type'];
 		$redirect = ( isset( $feed['meta']['redirect'] ) && $feed['meta']['redirect'] ) ? true : false ;
 		$field_map = $this->get_field_map_fields( $feed, 'si_fields' );
-
+		
 		// Loop through the fields from the field map setting building an array of values to be passed to the third-party service.
 		$submission = array();
 		foreach ( $field_map as $name => $field_id ) {
@@ -89,7 +89,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 				break;
 			case 'estimate':
 				$estimate_id = $this->create_estimate( $submission, $entry, $form );
-				$this->create_client( $submission, $entry, $form, $estimate_id );
+				$this->create_client( $submission, $entry, $form, $estimate_id  );
 				break;
 			case 'client':
 				$this->create_client( $submission, $entry, $form );
@@ -146,7 +146,6 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 				'value' => $value,
 			);
 		}
-
 		return array(
 			array(
 				'title'  => esc_html__( 'Sprout Invoices Integration Options', 'sprout-invoices' ),
@@ -207,6 +206,11 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 								'name'     => 'email',
 								'label'    => __( 'Email', 'sprout-invoices' ),
 								'required' => 1,
+							),
+							array(
+								'name'     => 'client_phone',
+								'label'    => __( 'Client Phone', 'sprout-invoices' ),
+								'required' => 0,
 							),
 							array(
 								'name'     => 'address',
@@ -369,12 +373,14 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		return $estimate_id;
 	}
 
-	protected function create_client( $submission = array(), $entry = array(), $form = array(), $doc_id = 0 ) {
+	protected function create_client( $submission = array(), $entry = array(), $form = array(), $doc_id = 0  ) {
 
 		$email = $submission['email'];
 		$client_name = $submission['client_name'];
+		$client_phone = $submission['client_phone'];
 		$first_name = $submission['user_first_name'];
 		$last_name = $submission['user_last_name'];
+
 
 		/**
 		 * Attempt to create a user before creating a client.
@@ -398,6 +404,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 					'user_login' => esc_attr__( $email ),
 					'display_name' => isset( $client_name ) ? esc_attr__( $client_name ) : esc_attr__( $email ),
 					'user_email' => esc_attr__( $email ),
+					'phone' => isset( $client_phone ) ? esc_attr__( $client_phone ) : esc_attr__( $client_phone ),
 					'first_name' => $first_name,
 					'last_name' => $last_name,
 					'user_url' => '',
@@ -420,6 +427,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		if ( $client ) {
 			$client->set_title( $submission['client_name'] );
 			$client->set_address( $submission['full_address'] );
+			$client->set_phone($submission['client_phone']);
 
 		} else {
 			// Make up the args in creating a client
