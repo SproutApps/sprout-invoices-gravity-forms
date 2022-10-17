@@ -78,6 +78,22 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 				);
 		}
 
+		
+		if ( isset( $field_map['ship_address'] ) ) {
+			$ship_addy_field_id = (int) $field_map['ship_address'];
+			$ship_state = str_replace( '  ', ' ', trim( rgar( $entry, $ship_addy_field_id . '.4' ) ) );
+			$ship_state_code = GF_Fields::get( 'address' )->get_us_state_code( $ship_state );
+			$ship_country = str_replace( '  ', ' ', trim( rgar( $entry, $ship_addy_field_id . '.6' ) ) );
+			$ship_country_code = GF_Fields::get( 'address' )->get_country_code( $ship_country );
+			$submission['full_ship_address'] = array(
+					'street' => str_replace( '  ', ' ', trim( rgar( $entry, $ship_addy_field_id . '.1' ) ) ) . ' ' . str_replace( '  ', ' ', trim( rgar( $entry, $ship_addy_field_id . '.2' ) ) ),
+					'city' => str_replace( '  ', ' ', trim( rgar( $entry, $ship_addy_field_id . '.3' ) ) ),
+					'zone' => $state_code,
+					'postal_code' => str_replace( '  ', ' ', trim( rgar( $entry, $ship_addy_field_id . '.5' ) ) ),
+					'country' => $ship_country_code,
+				);
+		}
+
 		$submission['line_items'] = $this->get_line_items( $feed, $entry, $form );
 
 		do_action( 'si_log', __CLASS__ . '::' . __FUNCTION__ . ' - submission', $submission, false );
@@ -211,6 +227,12 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 							array(
 								'name'     => 'address',
 								'label'    => __( 'Address', 'sprout-invoices' ),
+								'required' => 0,
+								'field_type' => array( 'address' ),
+							),
+							array(
+								'name'     => 'ship_address',
+								'label'    => __( 'Shipping Address', 'sprout-invoices' ),
 								'required' => 0,
 								'field_type' => array( 'address' ),
 							),
@@ -420,6 +442,9 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 		if ( $client ) {
 			$client->set_title( $submission['client_name'] );
 			$client->set_address( $submission['full_address'] );
+			if(class_exists('SI_Shipping_Addy')){
+				SI_Shipping_Addy::set_shipping_address( $submission['full_ship_address'] );
+			}
 
 		} else {
 			// Make up the args in creating a client
@@ -427,6 +452,7 @@ class SI_GF_Integration_Addon extends GFFeedAddOn {
 				'company_name' => $submission['client_name'],
 				'website' => '',
 				'address' => $submission['full_address'],
+				'ship_address' => $submission['full_ship_address'],
 				'user_id' => $user_id,
 			);
 			$client_id = SI_Client::new_client( $args );
